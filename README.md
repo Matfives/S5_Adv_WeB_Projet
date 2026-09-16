@@ -1,15 +1,15 @@
 # S5_Adv_WeB_Projet
 
-## Objectif
+## Objective
 
-Créer un site web complet comprenant :
+Create a complete web application including:
 
-* Un Frontend en HTML, CSS et JavaScript
-* Un Backend pour gérer la logique du site
-* Une base de données SQL
-* La communication entre le Frontend, le Backend et la base de données
+* A Frontend using HTML, CSS and JavaScript
+* A Backend to handle the application's logic
+* An SQL database
+* Communication between the Frontend, Backend and database
 
-## Membres
+## Team Members
 
 * Mathis Poisson
 * Julie Sieux
