@@ -1,0 +1,37 @@
+{
+  "restaurants": [
+    { "rest_id": 1, "rest_name": "Le Gourmet", "rest_adress": "12 Rue de Paris", "rest_size": "Grand", "rest_phone": 145236987, "rest_hours": "09:00-23:00" },
+    { "rest_id": 2, "rest_name": "Pizza Roma", "rest_adress": "5 Avenue Rome", "rest_size": "Moyen", "rest_phone": 145236988, "rest_hours": "10:00-22:00" }
+  ],
+  "users": [
+    { "user_id": 1, "user_name": "Jean Dupont", "user_type": "Client", "user_phone": "0601020304", "user_birthdate": "1990-05-12", "user_city": "Paris", "rest_id": 1 },
+    { "user_id": 2, "user_name": "Marie Curie", "user_type": "Client", "user_phone": "0601020305", "user_birthdate": "1985-03-21", "user_city": "Lyon", "rest_id": 2 },
+    { "user_id": 3, "user_name": "Ali Ben", "user_type": "Livreur", "user_phone": "0601020306", "user_birthdate": "1995-07-09", "user_city": "Marseille", "rest_id": 3 }
+  ],
+  "dishes": [
+    { "dish_id": 1, "dish_type": "Entree", "dish_name": "Salade Cesar", "dish_price": 8.50, "dish_calories": "350", "dish_ingredients": "Salade, Poulet, Parmesan" },
+    { "dish_id": 2, "dish_type": "Plat", "dish_name": "Pizza Margherita", "dish_price": 12.00, "dish_calories": "800", "dish_ingredients": "Tomate, Mozzarella, Basilic" }
+  ],
+  "orders": [
+    {
+      "order_id": "CMD001",
+      "user": { "user_id": 1, "user_name": "Jean Dupont" },
+      "dish": { "dish_id": 2, "dish_name": "Pizza Margherita", "dish_price": 12.00 }
+    },
+    {
+      "order_id": "CMD001",
+      "user": { "user_id": 2, "user_name": "Marie Curie" },
+      "dish": { "dish_id": 2, "dish_name": "Pizza Margherita", "dish_price": 12.00 }
+    }
+  ],
+  "deliveries": [
+    {
+      "livreur": { "user_id": 3, "user_name": "Ali Ben" },
+      "client": { "user_id": 1, "user_name": "Jean Dupont" }
+    },
+    {
+      "livreur": { "user_id": 3, "user_name": "Ali Ben" },
+      "client": { "user_id": 2, "user_name": "Marie Curie" }
+    }
+  ]
+}
