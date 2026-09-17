@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS Restaurant;
 USE Restaurant;
 
 DROP TABLE IF EXISTS serve;
-DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS order_;
 DROP TABLE IF EXISTS dish;
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Restaurants;
@@ -39,13 +39,18 @@ CREATE TABLE dish (
 	CONSTRAINT pk_dish PRIMARY KEY (dish_id)
 );
 
-CREATE TABLE orders (
+CREATE TABLE order_ (
 	user_id int,
     dish_id int,
     order_id varchar(50),
-	CONSTRAINT pk_orders PRIMARY KEY (user_id, dish_id),
-	CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES Users(user_id),
-	CONSTRAINT fk_orders_dish FOREIGN KEY (dish_id) REFERENCES dish(dish_id)
+    order_finalSum decimal(15,2),
+    order_date date,
+    order_hour time,
+    order_table int,
+    order_AdressBill varchar(50),
+	CONSTRAINT pk_order_ PRIMARY KEY (user_id, dish_id),
+	CONSTRAINT fk_order_user FOREIGN KEY (user_id) REFERENCES Users(user_id),
+	CONSTRAINT fk_order_dish FOREIGN KEY (dish_id) REFERENCES dish(dish_id)
 );
 
 CREATE TABLE serve (
@@ -55,13 +60,6 @@ CREATE TABLE serve (
 	CONSTRAINT fk_serve_livreur FOREIGN KEY (user_id) REFERENCES Users(user_id),
 	CONSTRAINT fk_serve_client FOREIGN KEY (user_id_1) REFERENCES Users(user_id)
 );
-
--- ===================== DATA =====================
-
--- The orders CMD001, CMD002, CMD003, CMD004 and CMD005 are each shared
--- by two different users (same order_id, different user_id).
--- This is allowed because the primary key is based on (user_id, dish_id),
--- not on order_id.
 
 INSERT INTO Restaurants (rest_name, rest_adress, rest_size, rest_phone, rest_hours) VALUES
 ('Le Gourmet', '12 Rue de Paris', 'Grand', 145236987, '09:00-23:00'),
@@ -99,20 +97,17 @@ INSERT INTO dish (dish_type, dish_name, dish_price, dish_calories, dish_ingredie
 ('Plat', 'Pates Carbonara', 11.00, '850', 'Pates, Oeuf, Lardons, Parmesan'),
 ('Plat', 'Saumon Grille', 16.00, '500', 'Saumon, Citron, Legumes');
 
--- Les commandes CMD001, CMD002, CMD003, CMD004, CMD005 sont chacune partagees
--- par 2 utilisateurs differents (meme order_id, user_id different) : rien ne
--- l'empeche car la cle primaire porte sur (user_id, dish_id), pas sur order_id.
-INSERT INTO orders (user_id, dish_id, order_id) VALUES
-(1, 2, 'CMD001'),
-(2, 2, 'CMD001'),
-(4, 1, 'CMD002'),
-(6, 6, 'CMD002'),
-(8, 8, 'CMD003'),
-(10, 9, 'CMD003'),
-(1, 5, 'CMD004'),
-(2, 3, 'CMD004'),
-(6, 7, 'CMD005'),
-(8, 10, 'CMD005');
+INSERT INTO order_ (user_id, dish_id, order_id, order_finalSum, order_date, order_hour, order_table, order_AdressBill) VALUES
+(1, 2, 'CMD001', 24.00, '2024-01-10', '12:30:00', 5, '12 Rue de Paris'),
+(2, 2, 'CMD001', 24.00, '2024-01-10', '12:31:00', 5, '12 Rue de Paris'),
+(4, 1, 'CMD002', 22.00, '2024-01-11', '13:10:00', 3, '5 Avenue Rome'),
+(6, 6, 'CMD002', 22.00, '2024-01-11', '13:00:00', 3, '5 Avenue Rome'),
+(8, 8, 'CMD003', 19.00, '2024-01-12', '19:41:00', 7, '9 Rue Ankara'),
+(10, 9, 'CMD003', 19.00, '2024-01-12', '19:45:00', 7, '9 Rue Ankara'),
+(1, 5, 'CMD004', 21.00, '2024-01-13', '20:15:00', 2, '12 Rue de Paris'),
+(2, 3, 'CMD004', 21.00, '2024-01-13', '20:16:00', 2, '12 Rue de Paris'),
+(6, 7, 'CMD005', 25.00, '2024-01-14', '21:00:00', 8, '15 Rue Delhi'),
+(8, 10, 'CMD005', 25.00, '2024-01-14', '21:10:00', 8, '15 Rue Delhi');
 
 INSERT INTO serve (user_id, user_id_1) VALUES
 (3, 1),
@@ -126,31 +121,22 @@ INSERT INTO serve (user_id, user_id_1) VALUES
 (3, 4),
 (5, 8);
 
-
--- ===================== NON-CRUD QUERIES =====================
-
--- ===================== NON-CRUD QUERIES =====================
-
--- Query 1: Display the most ordered dishes and their total revenue.
 SELECT 
     d.dish_name,
     COUNT(*) AS number_of_orders,
     SUM(d.dish_price) AS total_revenue
-FROM orders o
+FROM order_ o
 JOIN dish d ON o.dish_id = d.dish_id
 GROUP BY d.dish_id, d.dish_name
 ORDER BY number_of_orders DESC;
 
-
--- Query 2: Display the customers with the highest number of orders
--- and the restaurant they are associated with.
 SELECT 
     u.user_name,
     r.rest_name,
     COUNT(o.order_id) AS number_of_orders
 FROM Users u
 JOIN Restaurants r ON u.rest_id = r.rest_id
-JOIN orders o ON u.user_id = o.user_id
+JOIN order_ o ON u.user_id = o.user_id
 WHERE u.user_type = 'Client'
 GROUP BY u.user_id, u.user_name, r.rest_name
 ORDER BY number_of_orders DESC;

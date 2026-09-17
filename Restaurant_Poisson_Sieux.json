@@ -1,37 +1,62 @@
 {
-  "restaurants": [
+  "Restaurants": [
     { "rest_id": 1, "rest_name": "Le Gourmet", "rest_adress": "12 Rue de Paris", "rest_size": "Grand", "rest_phone": 145236987, "rest_hours": "09:00-23:00" },
-    { "rest_id": 2, "rest_name": "Pizza Roma", "rest_adress": "5 Avenue Rome", "rest_size": "Moyen", "rest_phone": 145236988, "rest_hours": "10:00-22:00" }
+    { "rest_id": 2, "rest_name": "Pizza Roma", "rest_adress": "5 Avenue Rome", "rest_size": "Moyen", "rest_phone": 145236988, "rest_hours": "10:00-22:00" },
+    { "rest_id": 3, "rest_name": "Sushi World", "rest_adress": "8 Rue Tokyo", "rest_size": "Petit", "rest_phone": 145236989, "rest_hours": "11:00-21:00" },
+    { "rest_id": 4, "rest_name": "Burger House", "rest_adress": "20 Rue Chicago", "rest_size": "Moyen", "rest_phone": 145236990, "rest_hours": "10:00-23:00" },
+    { "rest_id": 5, "rest_name": "Le Petit Bistro", "rest_adress": "3 Rue Lyon", "rest_size": "Petit", "rest_phone": 145236991, "rest_hours": "08:00-20:00" },
+    { "rest_id": 6, "rest_name": "Curry Palace", "rest_adress": "15 Rue Delhi", "rest_size": "Grand", "rest_phone": 145236992, "rest_hours": "11:00-22:00" },
+    { "rest_id": 7, "rest_name": "Taco Fiesta", "rest_adress": "7 Rue Mexico", "rest_size": "Moyen", "rest_phone": 145236993, "rest_hours": "10:00-23:00" },
+    { "rest_id": 8, "rest_name": "Kebab Express", "rest_adress": "9 Rue Ankara", "rest_size": "Petit", "rest_phone": 145236994, "rest_hours": "11:00-02:00" },
+    { "rest_id": 9, "rest_name": "Pasta Amore", "rest_adress": "4 Rue Milan", "rest_size": "Moyen", "rest_phone": 145236995, "rest_hours": "09:00-22:00" },
+    { "rest_id": 10, "rest_name": "Ocean Grill", "rest_adress": "18 Rue Marseille", "rest_size": "Grand", "rest_phone": 145236996, "rest_hours": "10:00-23:00" }
   ],
-  "users": [
+  "Users": [
     { "user_id": 1, "user_name": "Jean Dupont", "user_type": "Client", "user_phone": "0601020304", "user_birthdate": "1990-05-12", "user_city": "Paris", "rest_id": 1 },
     { "user_id": 2, "user_name": "Marie Curie", "user_type": "Client", "user_phone": "0601020305", "user_birthdate": "1985-03-21", "user_city": "Lyon", "rest_id": 2 },
-    { "user_id": 3, "user_name": "Ali Ben", "user_type": "Livreur", "user_phone": "0601020306", "user_birthdate": "1995-07-09", "user_city": "Marseille", "rest_id": 3 }
+    { "user_id": 3, "user_name": "Ali Ben", "user_type": "Livreur", "user_phone": "0601020306", "user_birthdate": "1995-07-09", "user_city": "Marseille", "rest_id": 3 },
+    { "user_id": 4, "user_name": "Sophie Martin", "user_type": "Client", "user_phone": "0601020307", "user_birthdate": "1992-11-30", "user_city": "Paris", "rest_id": 4 },
+    { "user_id": 5, "user_name": "Karim Said", "user_type": "Livreur", "user_phone": "0601020308", "user_birthdate": "1998-01-15", "user_city": "Toulouse", "rest_id": 5 },
+    { "user_id": 6, "user_name": "Emma Bernard", "user_type": "Client", "user_phone": "0601020309", "user_birthdate": "1988-09-25", "user_city": "Nice", "rest_id": 6 },
+    { "user_id": 7, "user_name": "Lucas Petit", "user_type": "Livreur", "user_phone": "0601020310", "user_birthdate": "1996-02-18", "user_city": "Nantes", "rest_id": 7 },
+    { "user_id": 8, "user_name": "Chloe Robert", "user_type": "Client", "user_phone": "0601020311", "user_birthdate": "1993-06-05", "user_city": "Lille", "rest_id": 8 },
+    { "user_id": 9, "user_name": "Yassine Amar", "user_type": "Livreur", "user_phone": "0601020312", "user_birthdate": "1994-12-01", "user_city": "Bordeaux", "rest_id": 9 },
+    { "user_id": 10, "user_name": "Julie Moreau", "user_type": "Client", "user_phone": "0601020313", "user_birthdate": "1991-04-17", "user_city": "Strasbourg", "rest_id": 10 }
   ],
-  "dishes": [
+  "dish": [
     { "dish_id": 1, "dish_type": "Entree", "dish_name": "Salade Cesar", "dish_price": 8.50, "dish_calories": "350", "dish_ingredients": "Salade, Poulet, Parmesan" },
-    { "dish_id": 2, "dish_type": "Plat", "dish_name": "Pizza Margherita", "dish_price": 12.00, "dish_calories": "800", "dish_ingredients": "Tomate, Mozzarella, Basilic" }
+    { "dish_id": 2, "dish_type": "Plat", "dish_name": "Pizza Margherita", "dish_price": 12.00, "dish_calories": "800", "dish_ingredients": "Tomate, Mozzarella, Basilic" },
+    { "dish_id": 3, "dish_type": "Plat", "dish_name": "Sushi Mix", "dish_price": 15.00, "dish_calories": "600", "dish_ingredients": "Riz, Saumon, Thon, Avocat" },
+    { "dish_id": 4, "dish_type": "Plat", "dish_name": "Burger Classic", "dish_price": 10.00, "dish_calories": "900", "dish_ingredients": "Pain, Boeuf, Salade, Fromage" },
+    { "dish_id": 5, "dish_type": "Dessert", "dish_name": "Tiramisu", "dish_price": 6.00, "dish_calories": "450", "dish_ingredients": "Mascarpone, Cafe, Cacao" },
+    { "dish_id": 6, "dish_type": "Plat", "dish_name": "Curry Poulet", "dish_price": 13.50, "dish_calories": "700", "dish_ingredients": "Poulet, Riz, Epices, Lait de coco" },
+    { "dish_id": 7, "dish_type": "Plat", "dish_name": "Tacos Boeuf", "dish_price": 9.00, "dish_calories": "650", "dish_ingredients": "Tortilla, Boeuf, Fromage, Sauce" },
+    { "dish_id": 8, "dish_type": "Plat", "dish_name": "Kebab", "dish_price": 8.00, "dish_calories": "750", "dish_ingredients": "Pain, Viande, Salade, Sauce blanche" },
+    { "dish_id": 9, "dish_type": "Plat", "dish_name": "Pates Carbonara", "dish_price": 11.00, "dish_calories": "850", "dish_ingredients": "Pates, Oeuf, Lardons, Parmesan" },
+    { "dish_id": 10, "dish_type": "Plat", "dish_name": "Saumon Grille", "dish_price": 16.00, "dish_calories": "500", "dish_ingredients": "Saumon, Citron, Legumes" }
   ],
-  "orders": [
-    {
-      "order_id": "CMD001",
-      "user": { "user_id": 1, "user_name": "Jean Dupont" },
-      "dish": { "dish_id": 2, "dish_name": "Pizza Margherita", "dish_price": 12.00 }
-    },
-    {
-      "order_id": "CMD001",
-      "user": { "user_id": 2, "user_name": "Marie Curie" },
-      "dish": { "dish_id": 2, "dish_name": "Pizza Margherita", "dish_price": 12.00 }
-    }
+  "order_": [
+    { "user_id": 1, "dish_id": 2, "order_id": "CMD001", "order_finalSum": 24.00, "order_date": "2024-01-10", "order_hour": "12:30:00", "order_table": 5, "order_AdressBill": "12 Rue de Paris" },
+    { "user_id": 2, "dish_id": 2, "order_id": "CMD001", "order_finalSum": 24.00, "order_date": "2024-01-10", "order_hour": "12:30:00", "order_table": 5, "order_AdressBill": "12 Rue de Paris" },
+    { "user_id": 4, "dish_id": 1, "order_id": "CMD002", "order_finalSum": 22.00, "order_date": "2024-01-11", "order_hour": "13:00:00", "order_table": 3, "order_AdressBill": "5 Avenue Rome" },
+    { "user_id": 6, "dish_id": 6, "order_id": "CMD002", "order_finalSum": 22.00, "order_date": "2024-01-11", "order_hour": "13:00:00", "order_table": 3, "order_AdressBill": "5 Avenue Rome" },
+    { "user_id": 8, "dish_id": 8, "order_id": "CMD003", "order_finalSum": 19.00, "order_date": "2024-01-12", "order_hour": "19:45:00", "order_table": 7, "order_AdressBill": "9 Rue Ankara" },
+    { "user_id": 10, "dish_id": 9, "order_id": "CMD003", "order_finalSum": 19.00, "order_date": "2024-01-12", "order_hour": "19:45:00", "order_table": 7, "order_AdressBill": "9 Rue Ankara" },
+    { "user_id": 1, "dish_id": 5, "order_id": "CMD004", "order_finalSum": 21.00, "order_date": "2024-01-13", "order_hour": "20:15:00", "order_table": 2, "order_AdressBill": "12 Rue de Paris" },
+    { "user_id": 2, "dish_id": 3, "order_id": "CMD004", "order_finalSum": 21.00, "order_date": "2024-01-13", "order_hour": "20:15:00", "order_table": 2, "order_AdressBill": "12 Rue de Paris" },
+    { "user_id": 6, "dish_id": 7, "order_id": "CMD005", "order_finalSum": 25.00, "order_date": "2024-01-14", "order_hour": "21:00:00", "order_table": 8, "order_AdressBill": "15 Rue Delhi" },
+    { "user_id": 8, "dish_id": 10, "order_id": "CMD005", "order_finalSum": 25.00, "order_date": "2024-01-14", "order_hour": "21:00:00", "order_table": 8, "order_AdressBill": "15 Rue Delhi" }
   ],
-  "deliveries": [
-    {
-      "livreur": { "user_id": 3, "user_name": "Ali Ben" },
-      "client": { "user_id": 1, "user_name": "Jean Dupont" }
-    },
-    {
-      "livreur": { "user_id": 3, "user_name": "Ali Ben" },
-      "client": { "user_id": 2, "user_name": "Marie Curie" }
-    }
+  "serve": [
+    { "user_id": 3, "user_id_1": 1 },
+    { "user_id": 3, "user_id_1": 2 },
+    { "user_id": 5, "user_id_1": 4 },
+    { "user_id": 5, "user_id_1": 6 },
+    { "user_id": 7, "user_id_1": 8 },
+    { "user_id": 7, "user_id_1": 10 },
+    { "user_id": 9, "user_id_1": 1 },
+    { "user_id": 9, "user_id_1": 6 },
+    { "user_id": 3, "user_id_1": 4 },
+    { "user_id": 5, "user_id_1": 8 }
   ]
 }
