@@ -3,30 +3,30 @@
     <Navbar />
     <main class="content">
       <p class="subtitle">MY ACCOUNT</p>
-      <h2>Your profile</h2>
+      <h2>My profile</h2>
 
-      <div class="profile-card">
+      <div v-if="currentUser" class="profile-card">
         <div class="row">
-          <span class="label">Username :</span>
-          <span class="value">user_name</span>
+          <span class="label">Name:</span>
+          <span class="value">{{ currentUser.user_name }}</span>
         </div>
         <div class="row">
-          <span class="label">Account Type :</span>
-          <span class="value">user_type</span>
+          <span class="label">Type:</span>
+          <span class="value">{{ currentUser.user_type }}</span>
         </div>
         <div class="row">
           <span class="label">Phone:</span>
-          <span class="value">user_phone</span>
+          <span class="value">{{ currentUser.user_phone }}</span>
         </div>
         <div class="row">
-          <span class="label">Birthdate :</span>
-          <span class="value">user_birthdate</span>
+          <span class="label">Birthdate:</span>
+          <span class="value">{{ currentUser.user_birthdate }}</span>
         </div>
         <div class="row">
-          <span class="label">City :</span>
-          <span class="value">user_city</span>
+          <span class="label">City:</span>
+          <span class="value">{{ currentUser.user_city }}</span>
         </div>
-        <button class="logout-btn">Log Out</button>
+        <button type="button" class="logout-btn" @click="signOut">Logout</button>
       </div>
     </main>
   </div>
@@ -34,9 +34,22 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
+import { authState, logout } from '@/services/auth'
+
 export default {
   name: 'ProfileView',
-  components: { Navbar }
+  components: { Navbar },
+  computed: {
+    currentUser() {
+      return authState.currentUser
+    }
+  },
+  methods: {
+    signOut() {
+      logout()
+      this.$router.push('/')
+    }
+  }
 }
 </script>
 
