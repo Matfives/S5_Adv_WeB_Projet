@@ -2,7 +2,6 @@
 import { reactive, readonly } from 'vue'
 import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
 
-// Temporary frontend demo only. Replace this with backend authentication later.
 // The localStorage role and router guards do not provide real security.
 const SESSION_KEY = 'matking-demo-session'
 const session = reactive({

@@ -1,6 +1,6 @@
 <template>
   <header class="navbar">
-    <div class="brand">Matking</div>
+    <div class="brand">Chez Matking</div>
     <nav class="nav-links" aria-label="Main navigation">
       <router-link
         v-for="link in links"
