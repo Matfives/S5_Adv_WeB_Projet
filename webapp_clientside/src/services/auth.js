@@ -11,7 +11,7 @@ const session = reactive({
 })
 
 export const authState = readonly(session)
-export const demoCustomers = restaurantData.Users.filter(user => user.user_type === 'Client')
+export const demoCustomers = restaurantData.Users.filter(user => user.user_type === 'Customer')
 
 function startSession(role, user) {
   session.isAuthenticated = true
