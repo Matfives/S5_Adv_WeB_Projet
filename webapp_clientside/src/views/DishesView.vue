@@ -2,53 +2,22 @@
   <div class="page">
     <Navbar />
     <main class="content">
-      <p class="subtitle">MENU & HISTORY</p>
-      <h2>Our dishes & orders</h2>
+      <p class="subtitle">OUR MENU</p>
+      <h2>Our dishes</h2>
 
       <section class="section-block">
         <h3>Dishes menu</h3>
         <div class="dishes-grid">
-          <div class="dish-card" v-for="i in 4" :key="i">
+          <div class="dish-card" v-for="dish in dishes" :key="dish.dish_id">
             <div class="dish-header">
-              <span class="name">dish_name</span>
-              <span class="price">dish_price</span>
+              <span class="name">{{ dish.dish_name }}</span>
+              <span class="price">{{ dish.dish_price.toFixed(2) }} EUR</span>
             </div>
-            <p class="type">Type: dish_type</p>
-            <p class="ingredients">Ingredients: dish_ingredients</p>
-            <span class="calories">dish_calories</span>
+            <p class="type">Type: {{ dish.dish_type }}</p>
+            <p class="ingredients">Ingredients: {{ dish.dish_ingredients }}</p>
+            <span class="calories">{{ dish.dish_calories }} kcal</span>
           </div>
         </div>
-      </section>
-
-      <section class="section-block">
-        <h3>Your Past Orders (order_)</h3>
-        <table class="orders-table">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Date & Time</th>
-              <th>Table</th>
-              <th>Billing Address</th>
-              <th>Total Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>order_ID</td>
-              <td>order_date, order_hour</td>
-              <td>order_table</td>
-              <td>order_AdressBill</td>
-              <td>order_finalSum</td>
-            </tr>
-            <tr>
-              <td>order_ID</td>
-              <td>order_date, order_hour</td>
-              <td>order_table</td>
-              <td>order_AdressBill</td>
-              <td>order_finalSum</td>
-            </tr>
-          </tbody>
-        </table>
       </section>
     </main>
   </div>
@@ -56,9 +25,14 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
+import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
+
 export default {
   name: 'DishesView',
-  components: { Navbar }
+  components: { Navbar },
+  data() {
+    return { dishes: restaurantData.dish }
+  }
 }
 </script>
 
@@ -78,8 +52,4 @@ h2 { font-size: 28px; font-weight: 500; margin-bottom: 30px; }
 .type, .ingredients, .calories { font-size: 13px; color: #666; margin: 0; }
 .calories { font-style: italic; color: #888; }
 
-.orders-table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; border: 1px solid #eae5de; font-size: 14px; }
-.orders-table th, .orders-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
-.orders-table th { background: #f4f0eb; font-weight: 500; color: #444; }
-.orders-table tr:last-child td { border-bottom: none; }
 </style>

@@ -6,12 +6,12 @@
       <h2>Restaurants</h2>
       
       <div class="grid">
-        <div class="card" v-for="i in 3" :key="i">
-          <h3>rest_name</h3>
-          <p class="info"><strong>Address:</strong>rest_address</p>
-          <p class="info"><strong>Capacity (Size):</strong>rest_size</p>
-          <p class="info"><strong>Phone:</strong>rest_phone</p>
-          <p class="hours"><strong>Opening Hours:</strong>rest_hours</p>
+        <div class="card" v-for="restaurant in restaurants" :key="restaurant.rest_id">
+          <h3>{{ restaurant.rest_name }}</h3>
+          <p class="info"><strong>Address:</strong> {{ restaurant.rest_adress }}</p>
+          <p class="info"><strong>Capacity (Size):</strong> {{ restaurant.rest_size }}</p>
+          <p class="info"><strong>Phone:</strong> {{ restaurant.rest_phone }}</p>
+          <p class="hours"><strong>Opening Hours:</strong> {{ restaurant.rest_hours }}</p>
         </div>
       </div>
     </main>
@@ -20,9 +20,14 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
+import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
+
 export default {
   name: 'RestaurantsView',
-  components: { Navbar }
+  components: { Navbar },
+  data() {
+    return { restaurants: restaurantData.Restaurants }
+  }
 }
 </script>
 

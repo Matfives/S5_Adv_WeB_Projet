@@ -14,7 +14,13 @@
         <p class="description">
           Delicious food in a warm and welcoming atmosphere.
         </p>
+        <p v-if="auth.role === 'visitor'" class="visitor-note">
+          Browse the menu and restaurants as a visitor, or try a demo login.
+        </p>
         <div class="buttons">
+          <router-link v-if="auth.role === 'visitor'" to="/login" class="primary-btn">
+            Login
+          </router-link>
           <router-link to="/dishes" class="primary-btn">
             Discover the Menu
           </router-link>
@@ -38,10 +44,14 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
+import { authState } from '@/services/auth'
 
 export default {
   name: 'HomeView',
-  components: { Navbar }
+  components: { Navbar },
+  data() {
+    return { auth: authState }
+  }
 }
 </script>
 
@@ -54,7 +64,8 @@ export default {
 .small-title { font-size: 13px; letter-spacing: 4px; margin-bottom: 10px; }
 h1 { margin: 0; font-size: 55px; font-weight: 500; }
 .description { margin-top: 20px; font-size: 19px; }
-.buttons { display: flex; gap: 15px; margin-top: 30px; }
+.visitor-note { font-size: 14px; margin: 10px 0 0; }
+.buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 30px; }
 .primary-btn, .secondary-btn { padding: 13px 25px; border-radius: 4px; font-size: 15px; cursor: pointer; text-decoration: none; display: inline-block; }
 .primary-btn { border: none; background: white; color: #292929; }
 .secondary-btn { border: 1px solid white; background: transparent; color: white; }
