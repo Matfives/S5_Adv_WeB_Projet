@@ -17,8 +17,25 @@ const routes = [
     name: 'Dishes', 
     component: () => import('@/views/DishesView.vue') 
   },
+  {
+    path: '/dishes/new',
+    name: 'DishNew',
+    component: () => import('@/views/DishFormView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/dishes/:id',
+    name: 'DishDetail',
+    component: () => import('@/views/DishDetailView.vue')
+  },
+  {
+    path: '/dishes/:id/edit',
+    name: 'DishEdit',
+    component: () => import('@/views/DishFormView.vue'),
+    meta: { role: 'admin' }
+  },
   { 
-    path: '/servers', 
+    path: '/servers',
     name: 'Servers', 
     component: () => import('@/views/ServersView.vue'),
     meta: { role: 'customer' }
@@ -56,6 +73,24 @@ const routes = [
     path: '/admin/orders',
     name: 'AdminOrders',
     component: () => import('@/views/OrdersView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/admin/orders/new',
+    name: 'AdminOrderNew',
+    component: () => import('@/views/OrderFormView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/admin/orders/:orderId',
+    name: 'AdminOrderDetail',
+    component: () => import('@/views/OrderDetailView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/admin/orders/:orderId/edit',
+    name: 'AdminOrderEdit',
+    component: () => import('@/views/OrderFormView.vue'),
     meta: { role: 'admin' }
   }
 ]
