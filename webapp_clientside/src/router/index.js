@@ -12,8 +12,25 @@ const routes = [
     name: 'Restaurants', 
     component: () => import('@/views/RestaurantsView.vue') 
   },
+  {
+    path: '/restaurants/new',
+    name: 'RestaurantNew',
+    component: () => import('@/views/RestaurantFormView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/restaurants/:id',
+    name: 'RestaurantDetail',
+    component: () => import('@/views/RestaurantDetailView.vue')
+  },
+  {
+    path: '/restaurants/:id/edit',
+    name: 'RestaurantEdit',
+    component: () => import('@/views/RestaurantFormView.vue'),
+    meta: { role: 'admin' }
+  },
   { 
-    path: '/dishes', 
+    path: '/dishes',
     name: 'Dishes', 
     component: () => import('@/views/DishesView.vue') 
   },
@@ -46,8 +63,26 @@ const routes = [
     component: () => import('@/views/UsersView.vue'),
     meta: { role: 'admin' }
   },
+  {
+    path: '/users/new',
+    name: 'UserNew',
+    component: () => import('@/views/UserFormView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/users/:id',
+    name: 'UserDetail',
+    component: () => import('@/views/UserDetailView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/users/:id/edit',
+    name: 'UserEdit',
+    component: () => import('@/views/UserFormView.vue'),
+    meta: { role: 'admin' }
+  },
   { 
-    path: '/login', 
+    path: '/login',
     name: 'Login', 
     component: () => import('@/views/LoginView.vue') 
   },
