@@ -12,13 +12,47 @@ const routes = [
     name: 'Restaurants', 
     component: () => import('@/views/RestaurantsView.vue') 
   },
+  {
+    path: '/restaurants/new',
+    name: 'RestaurantNew',
+    component: () => import('@/views/RestaurantFormView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/restaurants/:id',
+    name: 'RestaurantDetail',
+    component: () => import('@/views/RestaurantDetailView.vue')
+  },
+  {
+    path: '/restaurants/:id/edit',
+    name: 'RestaurantEdit',
+    component: () => import('@/views/RestaurantFormView.vue'),
+    meta: { role: 'admin' }
+  },
   { 
-    path: '/dishes', 
+    path: '/dishes',
     name: 'Dishes', 
     component: () => import('@/views/DishesView.vue') 
   },
+  {
+    path: '/dishes/new',
+    name: 'DishNew',
+    component: () => import('@/views/DishFormView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/dishes/:id',
+    name: 'DishDetail',
+    component: () => import('@/views/DishDetailView.vue')
+  },
+  {
+    path: '/dishes/:id/edit',
+    name: 'DishEdit',
+    component: () => import('@/views/DishFormView.vue'),
+    meta: { role: 'admin' }
+  },
   { 
-    path: '/servers', 
+    path: '/servers',
     name: 'Servers', 
     component: () => import('@/views/ServersView.vue'),
     meta: { role: 'customer' }
@@ -29,8 +63,26 @@ const routes = [
     component: () => import('@/views/UsersView.vue'),
     meta: { role: 'admin' }
   },
+  {
+    path: '/users/new',
+    name: 'UserNew',
+    component: () => import('@/views/UserFormView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/users/:id',
+    name: 'UserDetail',
+    component: () => import('@/views/UserDetailView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/users/:id/edit',
+    name: 'UserEdit',
+    component: () => import('@/views/UserFormView.vue'),
+    meta: { role: 'admin' }
+  },
   { 
-    path: '/login', 
+    path: '/login',
     name: 'Login', 
     component: () => import('@/views/LoginView.vue') 
   },
@@ -56,6 +108,24 @@ const routes = [
     path: '/admin/orders',
     name: 'AdminOrders',
     component: () => import('@/views/OrdersView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/admin/orders/new',
+    name: 'AdminOrderNew',
+    component: () => import('@/views/OrderFormView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/admin/orders/:orderId',
+    name: 'AdminOrderDetail',
+    component: () => import('@/views/OrderDetailView.vue'),
+    meta: { role: 'admin' }
+  },
+  {
+    path: '/admin/orders/:orderId/edit',
+    name: 'AdminOrderEdit',
+    component: () => import('@/views/OrderFormView.vue'),
     meta: { role: 'admin' }
   }
 ]

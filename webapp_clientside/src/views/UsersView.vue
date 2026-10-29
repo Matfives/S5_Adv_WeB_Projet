@@ -3,7 +3,10 @@
     <Navbar />
     <main class="content">
       <p class="subtitle">USER DIRECTORY</p>
-      <h2>Users</h2>
+      <div class="crud-toolbar">
+        <h2>Users</h2>
+        <router-link :to="{ name: 'UserNew' }" class="crud-button">Add new user</router-link>
+      </div>
 
       <div class="filters">
         <div class="filter-field search-field">
@@ -42,6 +45,7 @@
               <th scope="col">Birthdate</th>
               <th scope="col">City</th>
               <th scope="col">Restaurant ID</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -53,9 +57,16 @@
               <td>{{ user.user_birthdate }}</td>
               <td>{{ user.user_city }}</td>
               <td>{{ user.rest_id }}</td>
+              <td>
+                <div class="crud-actions">
+                  <router-link :to="{ name: 'UserDetail', params: { id: user.user_id } }" class="crud-button crud-button-secondary">Show</router-link>
+                  <router-link :to="{ name: 'UserEdit', params: { id: user.user_id } }" class="crud-button crud-button-secondary">Edit</router-link>
+                  <button type="button" class="crud-button crud-button-secondary" disabled title="Deletion is unavailable in this frontend prototype">Delete</button>
+                </div>
+              </td>
             </tr>
             <tr v-if="filteredUsers.length === 0">
-              <td colspan="7" class="empty-state">No users match your search and type filter.</td>
+              <td colspan="8" class="empty-state">No users match your search and type filter.</td>
             </tr>
           </tbody>
         </table>
@@ -97,11 +108,12 @@ export default {
 }
 </script>
 
+<style scoped src="@/assets/crud.css"></style>
 <style scoped>
 .page { min-height: 100vh; background: #f8f5f0; font-family: Arial, sans-serif; color: #292929; }
 .content { max-width: 1100px; margin: auto; padding: 50px 20px; }
 .subtitle { font-size: 11px; letter-spacing: 3px; color: #777; margin-bottom: 5px; }
-h2 { font-size: 28px; font-weight: 500; margin-bottom: 30px; }
+h2 { font-size: 28px; font-weight: 500; margin: 0; }
 .filters { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 15px; }
 .filter-field { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 180px; }
 .search-field { flex: 2; }
@@ -110,12 +122,13 @@ h2 { font-size: 28px; font-weight: 500; margin-bottom: 30px; }
 .filter-field input:focus, .filter-field select:focus { outline: 2px solid #292929; outline-offset: 2px; }
 .user-count { font-size: 13px; color: #777; margin-bottom: 15px; }
 .table-wrapper { width: 100%; overflow-x: auto; border: 1px solid #eae5de; border-radius: 6px; background: white; }
-.users-table { width: 100%; min-width: 850px; border-collapse: collapse; font-size: 14px; }
+.users-table { width: 100%; min-width: 1050px; border-collapse: collapse; font-size: 14px; }
 .users-table th, .users-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; white-space: nowrap; }
 .users-table th { background: #f4f0eb; font-weight: 500; color: #444; }
 .users-table tbody tr:last-child td { border-bottom: none; }
 .users-table tbody tr:hover { background: #faf8f5; }
 .users-table .empty-state { text-align: center; color: #777; padding: 25px 15px; }
+.users-table .crud-actions { flex-wrap: nowrap; }
 
 @media (max-width: 600px) {
   .filters { flex-direction: column; }
