@@ -8,9 +8,12 @@
         <router-link v-if="isAdmin" :to="{ name: 'DishNew' }" class="crud-button">Add new dish</router-link>
       </div>
 
-      <section class="section-block">
+      <section class="section-block" :aria-busy="loading">
         <h3>Dishes menu</h3>
-        <div class="dishes-grid">
+        <p v-if="loading" class="crud-note" role="status">Loading dishes...</p>
+        <p v-else-if="error" class="error-message" role="alert">{{ error }}</p>
+        <p v-else-if="dishes.length === 0" class="crud-note" role="status">No dishes are available.</p>
+        <div v-else class="dishes-grid">
           <div class="dish-card" v-for="dish in dishes" :key="dish.dish_id">
             <div class="dish-header">
               <span class="name">{{ dish.dish_name }}</span>
@@ -34,19 +37,41 @@
 </template>
 
 <script>
+/* eslint-env browser */
 import Navbar from '@/components/Navbar.vue'
-import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
 import { authState } from '@/services/auth'
 
 export default {
   name: 'DishesView',
   components: { Navbar },
   data() {
-    return { dishes: restaurantData.dish }
+    return { dishes: [], loading: true, error: '' }
+  },
+  mounted() {
+    this.loadDishes()
   },
   computed: {
     isAdmin() {
       return authState.role === 'admin'
+    }
+  },
+  methods: {
+    async loadDishes() {
+      this.loading = true
+      this.error = ''
+      this.dishes = []
+
+      try {
+        const response = await fetch('http://localhost:9000/api/dishes')
+        if (!response.ok) {
+          throw new Error(`Unable to load dishes (HTTP ${response.status})`)
+        }
+        this.dishes = await response.json()
+      } catch {
+        this.error = 'Unable to load dishes. Check that the backend is running on http://localhost:9000 and MySQL is available, then reload this page.'
+      } finally {
+        this.loading = false
+      }
     }
   }
 }
@@ -60,6 +85,7 @@ export default {
 h2 { font-size: 28px; font-weight: 500; margin: 0; }
 .section-block { margin-bottom: 40px; }
 .section-block h3 { font-size: 18px; font-weight: 500; margin-bottom: 15px; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
+.error-message { color: #a53333; font-size: 14px; line-height: 1.6; }
 
 .dishes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 15px; }
 .dish-card { background: white; padding: 20px; border-radius: 6px; border: 1px solid #eae5de; display: flex; flex-direction: column; gap: 8px; }
