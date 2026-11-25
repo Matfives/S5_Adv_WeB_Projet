@@ -7,58 +7,64 @@
         <h2>{{ isAdmin ? 'Orders' : 'My orders' }}</h2>
         <router-link v-if="isAdmin" :to="{ name: 'AdminOrderNew' }" class="crud-button">Add new order</router-link>
       </div>
-      <p class="record-count">
-        {{ orderRows.length }} order record{{ orderRows.length === 1 ? '' : 's' }}
-      </p>
 
-      <p v-if="orderRows.length === 0" class="empty-state">
-        {{ isAdmin ? 'No orders to display.' : 'You have no orders yet.' }}
-      </p>
-      <div v-else class="table-wrapper" role="region" aria-label="Orders table" tabindex="0">
-        <table class="orders-table">
-          <thead>
-            <tr>
-              <th scope="col">Order ID</th>
-              <th v-if="isAdmin" scope="col">Customer</th>
-              <th scope="col">Dish</th>
-              <th scope="col">Date</th>
-              <th scope="col">Time</th>
-              <th scope="col">Table</th>
-              <th scope="col">Billing address</th>
-              <th scope="col">Total</th>
-              <th v-if="isAdmin" scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="order in orderRows" :key="`${order.order_id}-${order.user_id}-${order.dish_id}`">
-              <td>{{ order.order_id }}</td>
-              <td v-if="isAdmin">{{ order.customerName }}</td>
-              <td>{{ order.dishName }}</td>
-              <td>{{ order.order_date }}</td>
-              <td>{{ order.order_hour }}</td>
-              <td>{{ order.order_table }}</td>
-              <td>{{ order.order_AdressBill }}</td>
-              <td>{{ order.order_finalSum.toFixed(2) }} EUR</td>
-              <td v-if="isAdmin">
-                <div class="crud-actions">
-                  <router-link :to="orderLocation('AdminOrderDetail', order)" class="crud-button crud-button-secondary">Show</router-link>
-                  <router-link :to="orderLocation('AdminOrderEdit', order)" class="crud-button crud-button-secondary">Edit</router-link>
-                  <button type="button" class="crud-button crud-button-secondary" disabled title="Deletion is unavailable in this frontend prototype">Delete</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <p v-if="loading" class="crud-note" role="status">Loading orders...</p>
+      <p v-else-if="error" class="crud-status" role="alert">{{ error }}</p>
+      <template v-else>
+        <p class="record-count">
+          {{ orderRows.length }} order record{{ orderRows.length === 1 ? '' : 's' }}
+        </p>
+
+        <p v-if="orderRows.length === 0" class="empty-state">
+          {{ isAdmin ? 'No orders to display.' : 'You have no orders yet.' }}
+        </p>
+        <div v-else class="table-wrapper" role="region" aria-label="Orders table" tabindex="0">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th scope="col">Order ID</th>
+                <th v-if="isAdmin" scope="col">Customer</th>
+                <th scope="col">Dish</th>
+                <th scope="col">Date</th>
+                <th scope="col">Time</th>
+                <th scope="col">Table</th>
+                <th scope="col">Billing address</th>
+                <th scope="col">Total</th>
+                <th v-if="isAdmin" scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="order in orderRows" :key="`${order.order_id}-${order.user_id}-${order.dish_id}`">
+                <td>{{ order.order_id }}</td>
+                <td v-if="isAdmin">{{ order.customerName }}</td>
+                <td>{{ order.dishName }}</td>
+                <td>{{ order.order_date }}</td>
+                <td>{{ order.order_hour }}</td>
+                <td>{{ order.order_table }}</td>
+                <td>{{ order.order_AdressBill }}</td>
+                <td>{{ order.order_finalSum.toFixed(2) }} EUR</td>
+                <td v-if="isAdmin">
+                  <div class="crud-actions">
+                    <router-link :to="orderLocation('AdminOrderDetail', order)" class="crud-button crud-button-secondary">Show</router-link>
+                    <router-link :to="orderLocation('AdminOrderEdit', order)" class="crud-button crud-button-secondary">Edit</router-link>
+                    <button type="button" class="crud-button crud-button-secondary" @click="removeOrder(order)">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
     </main>
   </div>
 </template>
 
 <script>
+/* eslint-env browser */
 import Navbar from '@/components/Navbar.vue'
 import { authState } from '@/services/auth'
-import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
-import { orderLocation, resolveOrderNames } from '@/services/orderRecords'
+import { apiGet, apiSend } from '@/services/api'
+import { orderLocation } from '@/services/orderRecords'
 
 export default {
   name: 'OrdersView',
@@ -66,7 +72,9 @@ export default {
   data() {
     return {
       auth: authState,
-      orders: restaurantData.order_
+      orders: [],
+      loading: true,
+      error: ''
     }
   },
   computed: {
@@ -74,18 +82,33 @@ export default {
       return this.auth.role === 'admin'
     },
     orderRows() {
-      let visibleOrders = []
-      if (this.isAdmin) {
-        visibleOrders = this.orders
-      } else if (this.auth.role === 'customer' && this.auth.currentUser) {
-        visibleOrders = this.orders.filter(order => order.user_id === this.auth.currentUser.user_id)
+      if (this.isAdmin) return this.orders
+      if (this.auth.role === 'customer' && this.auth.currentUser) {
+        return this.orders.filter(order => order.user_id === this.auth.currentUser.user_id)
       }
-
-      return visibleOrders.map(resolveOrderNames)
+      return []
+    }
+  },
+  async mounted() {
+    try {
+      this.orders = (await apiGet('/orders')) || []
+    } catch {
+      this.error = 'Unable to load orders. Check that the backend is running.'
+    } finally {
+      this.loading = false
     }
   },
   methods: {
-    orderLocation
+    orderLocation,
+    async removeOrder(order) {
+      if (!window.confirm(`Delete order ${order.order_id} (${order.dishName})?`)) return
+      try {
+        await apiSend('DELETE', `/orders/${order.user_id}/${order.dish_id}`)
+        this.orders = this.orders.filter(o => !(o.user_id === order.user_id && o.dish_id === order.dish_id))
+      } catch (e) {
+        window.alert(e.message)
+      }
+    }
   }
 }
 </script>

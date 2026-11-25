@@ -26,7 +26,7 @@
               <router-link :to="{ name: 'DishDetail', params: { id: dish.dish_id } }" class="crud-button crud-button-secondary">Show</router-link>
               <template v-if="isAdmin">
                 <router-link :to="{ name: 'DishEdit', params: { id: dish.dish_id } }" class="crud-button crud-button-secondary">Edit</router-link>
-                <button type="button" class="crud-button crud-button-secondary" disabled title="Deletion is unavailable in this frontend prototype">Delete</button>
+                <button type="button" class="crud-button crud-button-secondary" @click="removeDish(dish)">Delete</button>
               </template>
             </div>
           </div>
@@ -40,6 +40,7 @@
 /* eslint-env browser */
 import Navbar from '@/components/Navbar.vue'
 import { authState } from '@/services/auth'
+import { apiGet, apiSend } from '@/services/api'
 
 export default {
   name: 'DishesView',
@@ -62,15 +63,20 @@ export default {
       this.dishes = []
 
       try {
-        const response = await fetch('http://localhost:9000/api/dishes')
-        if (!response.ok) {
-          throw new Error(`Unable to load dishes (HTTP ${response.status})`)
-        }
-        this.dishes = await response.json()
+        this.dishes = (await apiGet('/dishes')) || []
       } catch {
         this.error = 'Unable to load dishes. Check that the backend is running on http://localhost:9000 and MySQL is available, then reload this page.'
       } finally {
         this.loading = false
+      }
+    },
+    async removeDish(dish) {
+      if (!window.confirm(`Delete "${dish.dish_name}"?`)) return
+      try {
+        await apiSend('DELETE', `/dishes/${dish.dish_id}`)
+        this.dishes = this.dishes.filter(d => d.dish_id !== dish.dish_id)
+      } catch (e) {
+        window.alert(e.message)
       }
     }
   }

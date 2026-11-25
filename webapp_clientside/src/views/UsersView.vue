@@ -8,83 +8,90 @@
         <router-link :to="{ name: 'UserNew' }" class="crud-button">Add new user</router-link>
       </div>
 
-      <div class="filters">
-        <div class="filter-field search-field">
-          <label for="user-search">Search users</label>
-          <input
-            id="user-search"
-            v-model="searchQuery"
-            type="search"
-            placeholder="Search by name or city"
-          />
+      <p v-if="loading" class="crud-note" role="status">Loading users...</p>
+      <p v-else-if="error" class="crud-status" role="alert">{{ error }}</p>
+      <template v-else>
+        <div class="filters">
+          <div class="filter-field search-field">
+            <label for="user-search">Search users</label>
+            <input
+              id="user-search"
+              v-model="searchQuery"
+              type="search"
+              placeholder="Search by name or city"
+            />
+          </div>
+          <div class="filter-field">
+            <label for="user-type">User type</label>
+            <select id="user-type" v-model="selectedType">
+              <option value="">All types</option>
+              <option v-for="type in userTypes" :key="type" :value="type">
+                {{ type }}
+              </option>
+            </select>
+          </div>
         </div>
-        <div class="filter-field">
-          <label for="user-type">User type</label>
-          <select id="user-type" v-model="selectedType">
-            <option value="">All types</option>
-            <option v-for="type in userTypes" :key="type" :value="type">
-              {{ type }}
-            </option>
-          </select>
+
+        <p class="user-count" role="status">
+          {{ filteredUsers.length }} matching user{{ filteredUsers.length === 1 ? '' : 's' }}
+          of {{ users.length }}
+        </p>
+
+        <div class="table-wrapper" role="region" aria-label="Users table" tabindex="0">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Type</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Birthdate</th>
+                <th scope="col">City</th>
+                <th scope="col">Restaurant ID</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user in filteredUsers" :key="user.user_id">
+                <td>{{ user.user_id }}</td>
+                <td>{{ user.user_name }}</td>
+                <td>{{ user.user_type }}</td>
+                <td>{{ user.user_phone }}</td>
+                <td>{{ user.user_birthdate }}</td>
+                <td>{{ user.user_city }}</td>
+                <td>{{ user.rest_id }}</td>
+                <td>
+                  <div class="crud-actions">
+                    <router-link :to="{ name: 'UserDetail', params: { id: user.user_id } }" class="crud-button crud-button-secondary">Show</router-link>
+                    <router-link :to="{ name: 'UserEdit', params: { id: user.user_id } }" class="crud-button crud-button-secondary">Edit</router-link>
+                    <button type="button" class="crud-button crud-button-secondary" @click="removeUser(user)">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="filteredUsers.length === 0">
+                <td colspan="8" class="empty-state">No users match your search and type filter.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-
-      <p class="user-count" role="status">
-        {{ filteredUsers.length }} matching user{{ filteredUsers.length === 1 ? '' : 's' }}
-        of {{ users.length }}
-      </p>
-
-      <div class="table-wrapper" role="region" aria-label="Users table" tabindex="0">
-        <table class="users-table">
-          <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Name</th>
-              <th scope="col">Type</th>
-              <th scope="col">Phone</th>
-              <th scope="col">Birthdate</th>
-              <th scope="col">City</th>
-              <th scope="col">Restaurant ID</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="user in filteredUsers" :key="user.user_id">
-              <td>{{ user.user_id }}</td>
-              <td>{{ user.user_name }}</td>
-              <td>{{ user.user_type }}</td>
-              <td>{{ user.user_phone }}</td>
-              <td>{{ user.user_birthdate }}</td>
-              <td>{{ user.user_city }}</td>
-              <td>{{ user.rest_id }}</td>
-              <td>
-                <div class="crud-actions">
-                  <router-link :to="{ name: 'UserDetail', params: { id: user.user_id } }" class="crud-button crud-button-secondary">Show</router-link>
-                  <router-link :to="{ name: 'UserEdit', params: { id: user.user_id } }" class="crud-button crud-button-secondary">Edit</router-link>
-                  <button type="button" class="crud-button crud-button-secondary" disabled title="Deletion is unavailable in this frontend prototype">Delete</button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="filteredUsers.length === 0">
-              <td colspan="8" class="empty-state">No users match your search and type filter.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      </template>
     </main>
   </div>
 </template>
 
 <script>
+/* eslint-env browser */
 import Navbar from '@/components/Navbar.vue'
-import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
+import { apiGet, apiSend } from '@/services/api'
 
 export default {
   name: 'UsersView',
   components: { Navbar },
   data() {
     return {
-      users: restaurantData.Users,
+      users: [],
+      loading: true,
+      error: '',
       searchQuery: '',
       selectedType: ''
     }
@@ -97,12 +104,32 @@ export default {
       const search = this.searchQuery.trim().toLowerCase()
 
       return this.users.filter(user => {
-        const matchesSearch = user.user_name.toLowerCase().includes(search) ||
-          user.user_city.toLowerCase().includes(search)
+        const matchesSearch = (user.user_name || '').toLowerCase().includes(search) ||
+          (user.user_city || '').toLowerCase().includes(search)
         const matchesType = this.selectedType === '' || user.user_type === this.selectedType
 
         return matchesSearch && matchesType
       })
+    }
+  },
+  async mounted() {
+    try {
+      this.users = (await apiGet('/users')) || []
+    } catch {
+      this.error = 'Unable to load users. Check that the backend is running.'
+    } finally {
+      this.loading = false
+    }
+  },
+  methods: {
+    async removeUser(user) {
+      if (!window.confirm(`Delete "${user.user_name}"?`)) return
+      try {
+        await apiSend('DELETE', `/users/${user.user_id}`)
+        this.users = this.users.filter(u => u.user_id !== user.user_id)
+      } catch (e) {
+        window.alert(e.message)
+      }
     }
   }
 }

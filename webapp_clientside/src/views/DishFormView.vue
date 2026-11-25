@@ -8,17 +8,20 @@
         <router-link :to="{ name: 'Dishes' }" class="crud-button crud-button-secondary">Back to dishes</router-link>
       </div>
 
-      <p v-if="isMissing" class="crud-panel">No dish matches this ID. Return to the menu to select an existing dish.</p>
-      <form v-else class="crud-panel" @submit.prevent="submitPrototype">
-        <p class="crud-note">Frontend prototype. This form previews dish information; changes are not saved.</p>
+      <p v-if="loading" class="crud-panel" role="status">Loading...</p>
+      <p v-else-if="isMissing" class="crud-panel">No dish matches this ID. Return to the menu to select an existing dish.</p>
+      <form v-else class="crud-panel" @submit.prevent="submit">
         <div class="crud-form-grid">
-          <div class="crud-field">
-            <label for="dish-name">Dish name</label>
+          <div class="crud-field crud-field-wide">
+            <label for="dish-name">Name</label>
             <input id="dish-name" v-model="form.dish_name" type="text" required />
           </div>
           <div class="crud-field">
-            <label for="dish-type">Dish type</label>
-            <input id="dish-type" v-model="form.dish_type" type="text" placeholder="e.g. Main course" required />
+            <label for="dish-type">Type</label>
+            <select id="dish-type" v-model="form.dish_type" required>
+              <option value="" disabled>Select a type</option>
+              <option v-for="type in dishTypes" :key="type" :value="type">{{ type }}</option>
+            </select>
           </div>
           <div class="crud-field">
             <label for="dish-price">Price (EUR)</label>
@@ -30,14 +33,14 @@
           </div>
           <div class="crud-field crud-field-wide">
             <label for="dish-ingredients">Ingredients</label>
-            <textarea id="dish-ingredients" v-model="form.dish_ingredients" rows="4" required></textarea>
+            <textarea id="dish-ingredients" v-model="form.dish_ingredients" rows="3" required></textarea>
           </div>
         </div>
         <div class="crud-actions">
-          <button type="submit" class="crud-button">Submit</button>
+          <button type="submit" class="crud-button" :disabled="saving">{{ saving ? 'Saving...' : 'Submit' }}</button>
           <router-link :to="cancelLocation" class="crud-button crud-button-secondary">Cancel</router-link>
         </div>
-        <p v-if="submitted" class="crud-status" role="status">Frontend prototype: data will be saved by the backend later. No changes have been saved.</p>
+        <p v-if="error" class="crud-status" role="alert">{{ error }}</p>
       </form>
     </main>
   </div>
@@ -45,23 +48,32 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
-import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
+import { apiGet, apiSend } from '@/services/api'
 
 export default {
   name: 'DishFormView',
   components: { Navbar },
   data() {
-    return { form: {}, submitted: false }
+    return {
+      form: {},
+      dishes: [],
+      loading: true,
+      saving: false,
+      error: ''
+    }
   },
   computed: {
     isEdit() {
       return this.$route.name === 'DishEdit'
     },
     dish() {
-      return restaurantData.dish.find(dish => String(dish.dish_id) === this.$route.params.id)
+      return this.dishes.find(dish => String(dish.dish_id) === this.$route.params.id)
+    },
+    dishTypes() {
+      return [...new Set(this.dishes.map(dish => dish.dish_type))].filter(Boolean).sort()
     },
     isMissing() {
-      return this.isEdit && !this.dish
+      return this.isEdit && !this.loading && !this.dish
     },
     cancelLocation() {
       return this.isEdit && this.dish
@@ -73,17 +85,40 @@ export default {
     '$route.fullPath': {
       immediate: true,
       handler() {
-        // All dish fields are scalar values. Copy them into a separate form model.
-        this.form = this.isEdit && this.dish ? { ...this.dish } : {
-          dish_name: '', dish_type: '', dish_price: '', dish_calories: '', dish_ingredients: ''
-        }
-        this.submitted = false
+        this.load()
       }
     }
   },
   methods: {
-    submitPrototype() {
-      this.submitted = true
+    async load() {
+      this.loading = true
+      this.error = ''
+      try {
+        this.dishes = (await apiGet('/dishes')) || []
+      } catch {
+        this.error = 'Unable to load data. Check that the backend is running.'
+      }
+      // Copy scalar values so editing never changes the loaded record.
+      this.form = this.isEdit && this.dish ? { ...this.dish } : {
+        dish_name: '', dish_type: '', dish_price: '', dish_calories: '', dish_ingredients: ''
+      }
+      this.loading = false
+    },
+    async submit() {
+      this.saving = true
+      this.error = ''
+      try {
+        if (this.isEdit) {
+          await apiSend('PUT', `/dishes/${this.dish.dish_id}`, this.form)
+        } else {
+          await apiSend('POST', '/dishes', this.form)
+        }
+        this.$router.push({ name: 'Dishes' })
+      } catch (e) {
+        this.error = e.message
+      } finally {
+        this.saving = false
+      }
     }
   }
 }
