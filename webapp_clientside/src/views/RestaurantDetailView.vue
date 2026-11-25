@@ -4,7 +4,7 @@
     <main class="crud-content">
       <p class="crud-subtitle">OUR LOCATIONS</p>
       <div class="crud-toolbar">
-        <h1 class="crud-heading">{{ restaurant ? restaurant.rest_name : 'Restaurant not found' }}</h1>
+        <h1 class="crud-heading">{{ restaurant ? restaurant.rest_name : loading ? 'Loading...' : 'Restaurant not found' }}</h1>
         <div class="crud-actions">
           <router-link :to="{ name: 'Restaurants' }" class="crud-button crud-button-secondary">Back to restaurants</router-link>
           <router-link v-if="restaurant && isAdmin" :to="{ name: 'RestaurantEdit', params: { id: restaurant.rest_id } }" class="crud-button">Edit</router-link>
@@ -21,6 +21,8 @@
           <dt>Opening hours</dt><dd>{{ restaurant.rest_hours }}</dd>
         </dl>
       </section>
+      <p v-else-if="loading" class="crud-panel" role="status">Loading restaurant...</p>
+      <p v-else-if="error" class="crud-panel" role="alert">{{ error }}</p>
       <p v-else class="crud-panel">No restaurant matches this ID. Return to the directory to browse our locations.</p>
     </main>
   </div>
@@ -28,18 +30,27 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
-import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
 import { authState } from '@/services/auth'
+import { apiGet } from '@/services/api'
 
 export default {
   name: 'RestaurantDetailView',
   components: { Navbar },
+  data() {
+    return { restaurant: null, loading: true, error: '' }
+  },
   computed: {
-    restaurant() {
-      return restaurantData.Restaurants.find(restaurant => String(restaurant.rest_id) === this.$route.params.id)
-    },
     isAdmin() {
       return authState.role === 'admin'
+    }
+  },
+  async mounted() {
+    try {
+      this.restaurant = await apiGet(`/restaurants/${encodeURIComponent(this.$route.params.id)}`)
+    } catch {
+      this.error = 'Unable to load this restaurant. Check that the backend is running.'
+    } finally {
+      this.loading = false
     }
   }
 }

@@ -8,7 +8,9 @@
         <router-link v-if="isAdmin" :to="{ name: 'RestaurantNew' }" class="crud-button">Add new restaurant</router-link>
       </div>
 
-      <div class="location-directory">
+      <p v-if="loading" class="crud-note" role="status">Loading restaurants...</p>
+      <p v-else-if="error" class="crud-status" role="alert">{{ error }}</p>
+      <div v-else class="location-directory">
         <article class="location-card" v-for="restaurant in restaurants" :key="restaurant.rest_id">
           <div class="location-information">
             <h3>{{ restaurant.rest_name }}</h3>
@@ -23,7 +25,7 @@
             <router-link :to="{ name: 'RestaurantDetail', params: { id: restaurant.rest_id } }" class="crud-button crud-button-secondary">Show</router-link>
             <template v-if="isAdmin">
               <router-link :to="{ name: 'RestaurantEdit', params: { id: restaurant.rest_id } }" class="crud-button crud-button-secondary">Edit</router-link>
-              <button type="button" class="crud-button crud-button-secondary" disabled title="Deletion is unavailable in this frontend prototype">Delete</button>
+              <button type="button" class="crud-button crud-button-secondary" @click="removeRestaurant(restaurant)">Delete</button>
             </template>
           </div>
         </article>
@@ -33,19 +35,40 @@
 </template>
 
 <script>
+/* eslint-env browser */
 import Navbar from '@/components/Navbar.vue'
-import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
 import { authState } from '@/services/auth'
+import { apiGet, apiSend } from '@/services/api'
 
 export default {
   name: 'RestaurantsView',
   components: { Navbar },
   data() {
-    return { restaurants: restaurantData.Restaurants }
+    return { restaurants: [], loading: true, error: '' }
   },
   computed: {
     isAdmin() {
       return authState.role === 'admin'
+    }
+  },
+  async mounted() {
+    try {
+      this.restaurants = (await apiGet('/restaurants')) || []
+    } catch {
+      this.error = 'Unable to load restaurants. Check that the backend is running.'
+    } finally {
+      this.loading = false
+    }
+  },
+  methods: {
+    async removeRestaurant(restaurant) {
+      if (!window.confirm(`Delete "${restaurant.rest_name}"?`)) return
+      try {
+        await apiSend('DELETE', `/restaurants/${restaurant.rest_id}`)
+        this.restaurants = this.restaurants.filter(r => r.rest_id !== restaurant.rest_id)
+      } catch (e) {
+        window.alert(e.message)
+      }
     }
   }
 }

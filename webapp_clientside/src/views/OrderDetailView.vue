@@ -4,7 +4,7 @@
     <main class="crud-content">
       <p class="crud-subtitle">ORDER ADMINISTRATION</p>
       <div class="crud-toolbar">
-        <h1 class="crud-heading">{{ order ? `Order ${order.order_id}` : 'Order not found' }}</h1>
+        <h1 class="crud-heading">{{ order ? `Order ${order.order_id}` : loading ? 'Loading...' : 'Order not found' }}</h1>
         <div class="crud-actions">
           <router-link :to="{ name: 'AdminOrders' }" class="crud-button crud-button-secondary">Back to orders</router-link>
           <router-link v-if="order" :to="editLocation" class="crud-button">Edit</router-link>
@@ -25,6 +25,8 @@
           <dt>Total</dt><dd>{{ order.order_finalSum.toFixed(2) }} EUR</dd>
         </dl>
       </section>
+      <p v-else-if="loading" class="crud-panel" role="status">Loading order...</p>
+      <p v-else-if="error" class="crud-panel" role="alert">{{ error }}</p>
       <p v-else class="crud-panel">No matching order record was found. Use the order directory to select a specific customer and dish record.</p>
     </main>
   </div>
@@ -32,18 +34,26 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
-import { findOrderRow, orderLocation, resolveOrderNames } from '@/services/orderRecords'
+import { fetchOrderRow, orderLocation } from '@/services/orderRecords'
 
 export default {
   name: 'OrderDetailView',
   components: { Navbar },
+  data() {
+    return { order: null, loading: true, error: '' }
+  },
   computed: {
-    order() {
-      const order = findOrderRow(this.$route)
-      return order ? resolveOrderNames(order) : null
-    },
     editLocation() {
       return this.order ? orderLocation('AdminOrderEdit', this.order) : null
+    }
+  },
+  async mounted() {
+    try {
+      this.order = await fetchOrderRow(this.$route)
+    } catch {
+      this.error = 'Unable to load this order. Check that the backend is running.'
+    } finally {
+      this.loading = false
     }
   }
 }

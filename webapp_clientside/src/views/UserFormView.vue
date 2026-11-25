@@ -8,9 +8,9 @@
         <router-link :to="{ name: 'Users' }" class="crud-button crud-button-secondary">Back to users</router-link>
       </div>
 
-      <p v-if="isMissing" class="crud-panel">No user matches this ID. Return to the directory to select an existing user.</p>
-      <form v-else class="crud-panel" @submit.prevent="submitPrototype">
-        <p class="crud-note">Frontend prototype. This form previews user information; changes are not saved.</p>
+      <p v-if="loading" class="crud-panel" role="status">Loading...</p>
+      <p v-else-if="isMissing" class="crud-panel">No user matches this ID. Return to the directory to select an existing user.</p>
+      <form v-else class="crud-panel" @submit.prevent="submit">
         <div class="crud-form-grid">
           <div class="crud-field">
             <label for="user-name">Name</label>
@@ -44,10 +44,10 @@
           </div>
         </div>
         <div class="crud-actions">
-          <button type="submit" class="crud-button">Submit</button>
+          <button type="submit" class="crud-button" :disabled="saving">{{ saving ? 'Saving...' : 'Submit' }}</button>
           <router-link :to="cancelLocation" class="crud-button crud-button-secondary">Cancel</router-link>
         </div>
-        <p v-if="submitted" class="crud-status" role="status">Frontend prototype: data will be saved by the backend later. No changes have been saved.</p>
+        <p v-if="error" class="crud-status" role="alert">{{ error }}</p>
       </form>
     </main>
   </div>
@@ -55,7 +55,7 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
-import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
+import { apiGet, apiSend } from '@/services/api'
 
 export default {
   name: 'UserFormView',
@@ -63,9 +63,11 @@ export default {
   data() {
     return {
       form: {},
-      submitted: false,
-      restaurants: restaurantData.Restaurants,
-      userTypes: [...new Set(restaurantData.Users.map(user => user.user_type))].sort()
+      users: [],
+      restaurants: [],
+      loading: true,
+      saving: false,
+      error: ''
     }
   },
   computed: {
@@ -73,10 +75,14 @@ export default {
       return this.$route.name === 'UserEdit'
     },
     user() {
-      return restaurantData.Users.find(user => String(user.user_id) === this.$route.params.id)
+      return this.users.find(user => String(user.user_id) === this.$route.params.id)
+    },
+    userTypes() {
+      // Database user types are form data, separate from authentication roles.
+      return [...new Set(this.users.map(user => user.user_type))].filter(Boolean).sort()
     },
     isMissing() {
-      return this.isEdit && !this.user
+      return this.isEdit && !this.loading && !this.user
     },
     cancelLocation() {
       return this.isEdit && this.user
@@ -88,18 +94,42 @@ export default {
     '$route.fullPath': {
       immediate: true,
       handler() {
-        // Database user types are form data, separate from authentication roles.
-        // Copy scalar values so editing never changes the imported user record.
-        this.form = this.isEdit && this.user ? { ...this.user } : {
-          user_name: '', user_type: '', user_phone: '', user_birthdate: '', user_city: '', rest_id: ''
-        }
-        this.submitted = false
+        this.load()
       }
     }
   },
   methods: {
-    submitPrototype() {
-      this.submitted = true
+    async load() {
+      this.loading = true
+      this.error = ''
+      try {
+        const [users, restaurants] = await Promise.all([apiGet('/users'), apiGet('/restaurants')])
+        this.users = users || []
+        this.restaurants = restaurants || []
+      } catch {
+        this.error = 'Unable to load data. Check that the backend is running.'
+      }
+      // Copy scalar values so editing never changes the loaded record.
+      this.form = this.isEdit && this.user ? { ...this.user } : {
+        user_name: '', user_type: '', user_phone: '', user_birthdate: '', user_city: '', rest_id: ''
+      }
+      this.loading = false
+    },
+    async submit() {
+      this.saving = true
+      this.error = ''
+      try {
+        if (this.isEdit) {
+          await apiSend('PUT', `/users/${this.user.user_id}`, this.form)
+        } else {
+          await apiSend('POST', '/users', this.form)
+        }
+        this.$router.push({ name: 'Users' })
+      } catch (e) {
+        this.error = e.message
+      } finally {
+        this.saving = false
+      }
     }
   }
 }

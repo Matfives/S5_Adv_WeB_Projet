@@ -8,20 +8,20 @@
         <router-link :to="{ name: 'AdminOrders' }" class="crud-button crud-button-secondary">Back to orders</router-link>
       </div>
 
-      <p v-if="isMissing" class="crud-panel">No matching order record was found. Use the order directory to select a specific customer and dish record.</p>
-      <form v-else class="crud-panel" @submit.prevent="submitPrototype">
-        <p class="crud-note">Frontend prototype. This form previews order information; changes are not saved.</p>
+      <p v-if="loading" class="crud-panel" role="status">Loading...</p>
+      <p v-else-if="isMissing" class="crud-panel">No matching order record was found. Use the order directory to select a specific customer and dish record.</p>
+      <form v-else class="crud-panel" @submit.prevent="submit">
         <div class="crud-form-grid">
           <div class="crud-field">
             <label for="order-customer">Customer</label>
-            <select id="order-customer" v-model="form.user_id" required>
+            <select id="order-customer" v-model="form.user_id" :disabled="isEdit" required>
               <option value="" disabled>Select a customer</option>
               <option v-for="customer in customers" :key="customer.user_id" :value="customer.user_id">{{ customer.user_name }} (ID {{ customer.user_id }})</option>
             </select>
           </div>
           <div class="crud-field">
             <label for="order-dish">Dish</label>
-            <select id="order-dish" v-model="form.dish_id" required>
+            <select id="order-dish" v-model="form.dish_id" :disabled="isEdit" required>
               <option value="" disabled>Select a dish</option>
               <option v-for="dish in dishes" :key="dish.dish_id" :value="dish.dish_id">{{ dish.dish_name }} (ID {{ dish.dish_id }})</option>
             </select>
@@ -52,10 +52,10 @@
           </div>
         </div>
         <div class="crud-actions">
-          <button type="submit" class="crud-button">Submit</button>
+          <button type="submit" class="crud-button" :disabled="saving">{{ saving ? 'Saving...' : 'Submit' }}</button>
           <router-link :to="cancelLocation" class="crud-button crud-button-secondary">Cancel</router-link>
         </div>
-        <p v-if="submitted" class="crud-status" role="status">Frontend prototype: data will be saved by the backend later. No changes have been saved.</p>
+        <p v-if="error" class="crud-status" role="alert">{{ error }}</p>
       </form>
     </main>
   </div>
@@ -63,8 +63,8 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
-import restaurantData from '@/data/Restaurant_Poisson_Sieux.json'
-import { findOrderRow, orderLocation } from '@/services/orderRecords'
+import { apiGet, apiSend } from '@/services/api'
+import { fetchOrderRow, orderLocation } from '@/services/orderRecords'
 
 export default {
   name: 'OrderFormView',
@@ -72,20 +72,20 @@ export default {
   data() {
     return {
       form: {},
-      submitted: false,
-      customers: restaurantData.Users.filter(user => user.user_type === 'Customer'),
-      dishes: restaurantData.dish
+      order: null,
+      customers: [],
+      dishes: [],
+      loading: true,
+      saving: false,
+      error: ''
     }
   },
   computed: {
     isEdit() {
       return this.$route.name === 'AdminOrderEdit'
     },
-    order() {
-      return findOrderRow(this.$route)
-    },
     isMissing() {
-      return this.isEdit && !this.order
+      return this.isEdit && !this.loading && !this.order
     },
     cancelLocation() {
       return this.isEdit && this.order
@@ -97,18 +97,48 @@ export default {
     '$route.fullPath': {
       immediate: true,
       handler() {
-        // All order fields are scalar values. Never bind inputs to the JSON row.
-        this.form = this.isEdit && this.order ? { ...this.order } : {
-          user_id: '', dish_id: '', order_id: '', order_date: '', order_hour: '',
-          order_table: '', order_AdressBill: '', order_finalSum: ''
-        }
-        this.submitted = false
+        this.load()
       }
     }
   },
   methods: {
-    submitPrototype() {
-      this.submitted = true
+    async load() {
+      this.loading = true
+      this.error = ''
+      this.order = null
+      try {
+        const [users, dishes] = await Promise.all([apiGet('/users'), apiGet('/dishes')])
+        // In the database, customers have the user_type "Client".
+        this.customers = (users || []).filter(user => user.user_type === 'Client')
+        this.dishes = dishes || []
+        if (this.isEdit) {
+          this.order = await fetchOrderRow(this.$route)
+        }
+      } catch {
+        this.error = 'Unable to load data. Check that the backend is running.'
+      }
+      // All order fields are scalar values. Never bind inputs to the loaded record.
+      this.form = this.isEdit && this.order ? { ...this.order } : {
+        user_id: '', dish_id: '', order_id: '', order_date: '', order_hour: '',
+        order_table: '', order_AdressBill: '', order_finalSum: ''
+      }
+      this.loading = false
+    },
+    async submit() {
+      this.saving = true
+      this.error = ''
+      try {
+        if (this.isEdit) {
+          await apiSend('PUT', `/orders/${this.order.user_id}/${this.order.dish_id}`, this.form)
+        } else {
+          await apiSend('POST', '/orders', this.form)
+        }
+        this.$router.push({ name: 'AdminOrders' })
+      } catch (e) {
+        this.error = e.message
+      } finally {
+        this.saving = false
+      }
     }
   }
 }
